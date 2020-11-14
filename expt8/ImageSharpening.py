@@ -7,12 +7,14 @@ class MyFrame(wx.Frame):
         wx.Frame.__init__(self, parent, title=title, size=(200,100))
         self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
         self.CreateStatusBar()
+        self.dirname = ""
+        self.filename = ""
 
         # Setting up the menu
         filemenu = wx.Menu()
 
-        menuOpen = filemenu.Append(wx.ID_OPEN, "Open", " Open a text file")
-        menuAbout = filemenu.Append(wx.ID_ABOUT, "About", " Information about this program")
+        menuOpen = filemenu.Append(wx.ID_OPEN, "Open", " Open an image file")
+        menuAbout = filemenu.Append(wx.ID_ABOUT, "About", " Add stuff ")
         menuExit = filemenu.Append(wx.ID_EXIT, "Exit", " Terminate the program")
 
         menuBar = wx.MenuBar()
@@ -26,24 +28,23 @@ class MyFrame(wx.Frame):
         self.Show(True)
 
 
-    def OnOpen(self, event):
-        self.dirname = ""
+    def OnOpen(self, _event):
         dlg = wx.FileDialog(self, "Choose a file", self.dirname, "", "*.*", wx.FD_OPEN)
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetFilename()
             self.dirname = dlg.GetDirectory()
-            f = open(os.path.join(self.dirname, self.filename), 'r')
-            self.control.SetValue(f.read())
-            f.close()
+            textFile = open(os.path.join(self.dirname, self.filename), 'r')
+            self.control.SetValue(textFile.read())
+            textFile.close()
         dlg.Destroy()
 
-    def OnAbout(self, event):
+    def OnAbout(self, _event):
         # A message dialog with an OK button.
         dlg = wx.MessageDialog(self, "A small text editor", "About Sample Editor", wx.OK)
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnExit(self, event):
+    def OnExit(self, _event):
         self.Close(True)
 
 
