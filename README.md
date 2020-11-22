@@ -10,3 +10,4 @@ I had to implement these are part of my practical work. The GUI is build using w
 ## Project Organisation
 All the `expt*.py` files contain modular functions that accept a pillow image, process it and return the pillow image. These can used anywhere.  
 `main.py` contains the driver code that builds the GUI and uses the `expt*.py` modules to process images.
+`convert.py` contains helpful uitlity fuctions to convert between WxBitmaps, WxImages and PillowImages
