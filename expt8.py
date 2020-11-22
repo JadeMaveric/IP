@@ -46,5 +46,5 @@ def laplacian(img):
     laplace = PIL.ImageFilter.Kernel((3,3), (-1,-1,-1,-1,8,-1,-1,-1,-1), 1, 0)
 
     edgedImage = img.filter(laplace)
-    
+
     return edgedImage
