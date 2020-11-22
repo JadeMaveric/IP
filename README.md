@@ -8,5 +8,5 @@ I had to implement these are part of my practical work. The GUI is build using w
 * WxPython - The GUI, WxWidgets needs to be installed on the system
 
 ## Project Organisation
-All the `expt*.py` files contain modular functions that accept a pillow image, process it and return the pillow image. They can used anywhere  
+All the `expt*.py` files contain modular functions that accept a pillow image, process it and return the pillow image. These can used anywhere.  
 `main.py` contains the driver code that builds the GUI and uses the `expt*.py` modules to process images.
