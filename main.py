@@ -13,6 +13,7 @@ class ImagePanel(wx.Panel):
         wx.Panel.__init__(self, parent, ID)
         self.image = None
         self.bitmap = None
+        self.original = None
         wx.EVT_PAINT(self, self.OnPaint)
 
     def display(self, pil_image):
@@ -20,10 +21,6 @@ class ImagePanel(wx.Panel):
         self.image = pil_image
         self.bitmap = convert.PilImageToWxBitmap(pil_image)
         self.Refresh(True)
-
-    def setOriginal(self, pil_image):
-        "Sets the original image"
-        self.original = pil_image
 
     def OnPaint(self, _event):
         "@override Called whenever frame is painted"
@@ -77,10 +74,13 @@ class MyFrame(wx.Frame):
 
         menuSobel = expt8menu.Append(wx.ID_ANY, "Sobel", "Apply the Sobel operator")
         menuPrewitt = expt8menu.Append(wx.ID_ANY, "Prewitt", "Apply the Prewitt operator")
+        menuLaplacian = expt8menu.Append(wx.ID_ANY, "Laplacian", "Apply the Laplacian operator")
+
         menuBar.Append(expt8menu, "Expt8")
 
         self.Bind(wx.EVT_MENU, self.OnSobel, menuSobel)
         self.Bind(wx.EVT_MENU, self.OnPrewitt, menuPrewitt)
+        self.Bind(wx.EVT_MENU, self.OnLaplacian, menuLaplacian)
         self.Show(True)
 
     # FILE MENU
@@ -93,9 +93,9 @@ class MyFrame(wx.Frame):
             imagePath = os.path.join(self.dirname, self.filename)
             pilImage = Image.open(imagePath)
             self.control.display(pilImage)
-            self.control.setOriginal(pilImage)
+            self.control.original = pilImage
         dlg.Destroy()
-    
+
     def OnReset(self, _event):
         "Resets the current image"
         OriginalImage = self.control.original
@@ -130,6 +130,13 @@ class MyFrame(wx.Frame):
         PilImage = self.control.image
         EdgePilImage = expt8.sobel(PilImage)
         self.control.display(EdgePilImage)
+
+    def OnLaplacian(self, _event):
+        "Grab curent image, apply laplacian, display"
+        PilImage = self.control.image
+        EdgePilImage = expt8.laplacian(PilImage)
+        self.control.display(EdgePilImage)
+        print(_event.GetEventObject())
 
 
 app = wx.App(False)
