@@ -4,7 +4,9 @@ import wx
 from PIL import Image
 
 import expt2
+import expt7
 import expt8
+
 import convert
 
 class ImagePanel(wx.Panel):
@@ -69,6 +71,20 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnGray, menuGray)
         self.Show()
 
+        # Expt 7 menu
+        expt7menu = wx.Menu()
+
+        menuBox = expt7menu.Append(wx.ID_ANY, "Box", "Apply the Box operator")
+        menuMedian = expt7menu.Append(wx.ID_ANY, "Median", "Apply the Median operator")
+        menuWeightedAvg = expt7menu.Append(wx.ID_ANY, "Weighted Avg", "Apply a weighted avg filter")
+
+        menuBar.Append(expt7menu, "Expt7")
+
+        self.Bind(wx.EVT_MENU, self.OnBox, menuBox)
+        self.Bind(wx.EVT_MENU, self.OnMedian, menuMedian)
+        self.Bind(wx.EVT_MENU, self.OnWeightedAvg, menuWeightedAvg)
+        self.Show(True)
+        
         # Expt 8 menu
         expt8menu = wx.Menu()
 
@@ -118,6 +134,25 @@ class MyFrame(wx.Frame):
         GrayPilImage = expt2.gray(PilImage)
         self.control.display(GrayPilImage)
 
+    # EXPT 7 MENU
+    def OnBox(self, _event):
+        "Grab the current image, apply Box operator, display"
+        PilImage = self.control.image
+        EdgePilImage = expt7.box(PilImage)
+        self.control.display(EdgePilImage)
+
+    def OnMedian(self, _event):
+        "Grab current image, apply Median, display"
+        PilImage = self.control.image
+        EdgePilImage = expt7.median(PilImage)
+        self.control.display(EdgePilImage)
+
+    def OnWeightedAvg(self, _event):
+        "Grab curent image, apply weighted average, display"
+        PilImage = self.control.image
+        EdgePilImage = expt7.weightedAvg(PilImage)
+        self.control.display(EdgePilImage)
+
     # EXPT 8 MENU
     def OnSobel(self, _event):
         "Grab the current image, apply sobel operator, display"
@@ -136,7 +171,6 @@ class MyFrame(wx.Frame):
         PilImage = self.control.image
         EdgePilImage = expt8.laplacian(PilImage)
         self.control.display(EdgePilImage)
-        print(_event.GetEventObject())
 
 
 app = wx.App(False)
