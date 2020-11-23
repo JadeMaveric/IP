@@ -4,6 +4,7 @@ import wx
 from PIL import Image
 
 import expt2
+import expt3
 import expt7
 import expt8
 
@@ -71,6 +72,16 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnGray, menuGray)
         self.Show()
 
+        # Expt 2 menu
+        expt3menu = wx.Menu()
+
+        menuNegative = expt3menu.Append(wx.ID_ANY, "Negative", "Convert image to its negative")
+        menuBar.Append(expt3menu, "Expt3")
+
+        self.Bind(wx.EVT_MENU, self.OnNegative, menuNegative)
+        self.Show()
+
+
         # Expt 7 menu
         expt7menu = wx.Menu()
 
@@ -84,7 +95,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnMedian, menuMedian)
         self.Bind(wx.EVT_MENU, self.OnWeightedAvg, menuWeightedAvg)
         self.Show(True)
-        
+
         # Expt 8 menu
         expt8menu = wx.Menu()
 
@@ -133,6 +144,13 @@ class MyFrame(wx.Frame):
         PilImage = self.control.image
         GrayPilImage = expt2.gray(PilImage)
         self.control.display(GrayPilImage)
+
+    # EXPT 2 MENU
+    def OnNegative(self, _event):
+        "Convert current image to its negative"
+        PilImage = self.control.image
+        NegativePilImage = expt3.negative(PilImage)
+        self.control.display(NegativePilImage)
 
     # EXPT 7 MENU
     def OnBox(self, _event):
