@@ -118,7 +118,7 @@ class MyFrame(wx.Frame):
             self.filename = dlg.GetFilename()
             self.dirname = dlg.GetDirectory()
             imagePath = os.path.join(self.dirname, self.filename)
-            pilImage = Image.open(imagePath)
+            pilImage = Image.open(imagePath).convert("RGB") # Always use 3x8bit images
             self.control.display(pilImage)
             self.control.original = pilImage
         dlg.Destroy()
