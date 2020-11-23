@@ -5,6 +5,7 @@ from PIL import Image
 
 import expt2
 import expt3
+import expt5
 import expt7
 import expt8
 
@@ -35,6 +36,40 @@ class ImagePanel(wx.Panel):
             dc.DrawBitmap(self.bitmap, 0,0)
 
 
+class PreviewFrame(wx.Frame):
+    "Temporary preview window"
+    def __init__(self, parent, title, images):
+        wx.Frame.__init__(self,parent, title=title)
+        self.control = ImagePanel(self, wx.ID_ANY)
+        self.images = images
+        self.index = 0
+
+        self.control.display(self.images[0])
+        self.control.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
+        self.control.SetFocus()
+
+        self.statusbar = self.CreateStatusBar()
+        self.statusbar.SetStatusText(
+            f'[{self.index+1}/{len(self.images)}] Use left/right arrow keys to cycle between images'
+        )
+
+        self.Show(True)
+
+    def OnKeyDown(self, event):
+        "Handle keypresses for left/right arrow keys"
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_LEFT:
+            self.index -= 1 if self.index > 0 else 0
+            self.control.display(self.images[self.index])
+        elif keycode == wx.WXK_RIGHT:
+            self.index += 1 if self.index < len(self.images)-1 else 0
+            self.control.display(self.images[self.index])
+        else:
+            event.Skip()
+        self.statusbar.SetStatusText(
+            f'[{self.index+1}/{len(self.images)}] Use left/right arrow keys to cycle between images'
+        )
+
 class MyFrame(wx.Frame):
     "App window"
     def __init__(self, parent,  title):
@@ -48,10 +83,11 @@ class MyFrame(wx.Frame):
         menuBar = wx.MenuBar()
         self.SetMenuBar(menuBar)
 
-        # Setting up the file menu
+        # File Menu (Expt 1)
         filemenu = wx.Menu()
 
         menuOpen = filemenu.Append(wx.ID_OPEN, "Open", "Open an image file")
+        menuSaveAs = filemenu.Append(wx.ID_SAVE, "Save As", "Save an image")
         menuReset = filemenu.Append(wx.ID_RESET, "Reset", "Reset open image")
         menuAbout = filemenu.Append(wx.ID_ABOUT, "About", "Image Processing Experiments")
         menuExit = filemenu.Append(wx.ID_EXIT, "Exit", " Terminate the program")
@@ -59,6 +95,7 @@ class MyFrame(wx.Frame):
         menuBar.Append(filemenu, "File")
 
         self.Bind(wx.EVT_MENU, self.OnOpen, menuOpen)
+        self.Bind(wx.EVT_MENU, self.OnSaveAs, menuSaveAs)
         self.Bind(wx.EVT_MENU, self.OnReset, menuReset)
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
         self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
@@ -72,7 +109,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnGray, menuGray)
         self.Show()
 
-        # Expt 2 menu
+        # Expt 3 menu
         expt3menu = wx.Menu()
 
         menuNegative = expt3menu.Append(wx.ID_ANY, "Negative", "Convert image to its negative")
@@ -81,6 +118,22 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnNegative, menuNegative)
         self.Show()
 
+        # Expt 5 menu
+        expt5menu = wx.Menu()
+        bitplanemenu = wx.Menu()
+
+        previewPlanes = expt5menu.Append(wx.ID_ANY, "Preview all", "Show all bitplanes together")
+        bitPlanes = [
+            bitplanemenu.Append(wx.ID_ANY, f'Bit {p}', f'Isolate bit plane {p}') for p in range(8)
+        ]
+
+        expt5menu.AppendMenu(wx.ID_ANY, "Bit Planes", bitplanemenu, "Display/preview bitplanes")
+        menuBar.Append(expt5menu, "Expt5")
+
+        self.Bind(wx.EVT_MENU, self.OnBitPlanePreview, previewPlanes)
+        for p in range(8):
+            self.Bind(wx.EVT_MENU, self.OnBitPlane(p), bitPlanes[p])
+        self.Show()
 
         # Expt 7 menu
         expt7menu = wx.Menu()
@@ -113,7 +166,10 @@ class MyFrame(wx.Frame):
     # FILE MENU
     def OnOpen(self, _event):
         "File dialog box"
-        dlg = wx.FileDialog(self, "Choose a file", self.dirname, "", "*.*", wx.FD_OPEN)
+        dlg = wx.FileDialog(self, "Choose a file", self.dirname, "",
+            wildcard="ALL files (*.*)|*.*|JPEG files (*.jpg)|*.jpg|PNG files (*.png)|*.png",
+            style=wx.FD_OPEN
+        )
         if dlg.ShowModal() == wx.ID_OK:
             self.filename = dlg.GetFilename()
             self.dirname = dlg.GetDirectory()
@@ -122,6 +178,19 @@ class MyFrame(wx.Frame):
             self.control.display(pilImage)
             self.control.original = pilImage
         dlg.Destroy()
+
+    def OnSaveAs(self, _event):
+        "Save as dialog box"
+        dlg = wx.FileDialog(self, "Save image", self.dirname,
+            wildcard="ALL files (*.*)|*.*|JPEG files (*.jpg)|*.jpg|PNG files (*.png)|*.png",
+            style=wx.FD_SAVE
+        )
+        if dlg.ShowModal() == wx.ID_OK:
+            self.filename = dlg.GetFilename()
+            self.dirname = dlg.GetDirectory()
+            imagePath = os.path.join(self.dirname, self.filename)
+            pilImage = self.control.image
+            pilImage.save(imagePath)
 
     def OnReset(self, _event):
         "Resets the current image"
@@ -145,12 +214,30 @@ class MyFrame(wx.Frame):
         GrayPilImage = expt2.gray(PilImage)
         self.control.display(GrayPilImage)
 
-    # EXPT 2 MENU
+    # EXPT 3 MENU
     def OnNegative(self, _event):
         "Convert current image to its negative"
         PilImage = self.control.image
         NegativePilImage = expt3.negative(PilImage)
         self.control.display(NegativePilImage)
+
+    # EXPT 5 MENU
+    def OnBitPlanePreview(self, _event):
+        "Preview all bitplanes in a new windows"
+        PilImg = self.control.image
+        bitplanes = expt5.allBitplanes(PilImg)
+        preview = PreviewFrame(self, "Bit Plane Previews", bitplanes)
+        preview.Show()
+
+    def OnBitPlane(self, plane):
+        "Construct a bitplane handler for the specified bitplane"
+        root = self # The main window
+        def _onBitPlane(_self):
+            "Slice the current image to the specified bitplane"
+            PilImage = root.control.image
+            BitplaneImage = expt5.bitplane(PilImage, plane)
+            root.control.display(BitplaneImage)
+        return _onBitPlane
 
     # EXPT 7 MENU
     def OnBox(self, _event):
