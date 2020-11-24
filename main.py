@@ -9,6 +9,7 @@ import expt5
 import expt7
 import expt8
 import expt9
+import expt10
 
 import convert
 
@@ -174,6 +175,15 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnHistogram, menuHist)
         self.Show(True)
 
+        # Expt 10 menu
+        expt10menu = wx.Menu()
+
+        menuHistEq = expt10menu.Append(wx.ID_ANY, "Histogram EQ", "Equalise the image")
+
+        menuBar.Append(expt10menu, "Expt10")
+
+        self.Bind(wx.EVT_MENU, self.OnHistogramEq, menuHistEq)
+
     # FILE MENU
     def OnOpen(self, _event):
         "File dialog box"
@@ -302,6 +312,13 @@ class MyFrame(wx.Frame):
         else:
             preview = PreviewFrame(self, "Histogram Preview", [hist])
             preview.Show()
+
+    # EXPT 10 MENU
+    def OnHistogramEq(self, _event):
+        "Grab current image, perform histogram EQ and display"
+        PilImage = self.control.image
+        HistEqImage = expt10.histogramEq(PilImage)
+        self.control.display(HistEqImage)
 
 app = wx.App(False)
 frame = MyFrame(None, 'IP Expts')
