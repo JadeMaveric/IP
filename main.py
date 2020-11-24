@@ -8,6 +8,7 @@ import expt3
 import expt5
 import expt7
 import expt8
+import expt9
 
 import convert
 
@@ -163,6 +164,16 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.OnLaplacian, menuLaplacian)
         self.Show(True)
 
+        # Expt 9 menu
+        expt9menu = wx.Menu()
+
+        menuHist = expt9menu.Append(wx.ID_ANY, "Histogram", "Open the histogram in a preview pane")
+
+        menuBar.Append(expt9menu, "Expt9")
+
+        self.Bind(wx.EVT_MENU, self.OnHistogram, menuHist)
+        self.Show(True)
+
     # FILE MENU
     def OnOpen(self, _event):
         "File dialog box"
@@ -272,11 +283,25 @@ class MyFrame(wx.Frame):
         self.control.display(EdgePilImage)
 
     def OnLaplacian(self, _event):
-        "Grab curent image, apply laplacian, display"
+        "Grab current image, apply laplacian, display"
         PilImage = self.control.image
         EdgePilImage = expt8.laplacian(PilImage)
         self.control.display(EdgePilImage)
 
+    # EXPT 9 MENU
+    def OnHistogram(self, _event):
+        "Grab current image, calculate histogram, show in preview window"
+        PilImage = self.control.image
+        hist = expt9.histogramImage(PilImage)
+        hist = hist.resize((400,300))
+
+        if hist.mode == 'RGB':
+            R,G,B = hist.split()
+            preview = PreviewFrame(self, "Histogram Preview", (hist,R,G,B))
+            preview.Show()
+        else:
+            preview = PreviewFrame(self, "Histogram Preview", [hist])
+            preview.Show()
 
 app = wx.App(False)
 frame = MyFrame(None, 'IP Expts')
