@@ -10,6 +10,7 @@ import expt7
 import expt8
 import expt9
 import expt10
+import expt11
 
 import convert
 
@@ -77,7 +78,7 @@ class MyFrame(wx.Frame):
     def __init__(self, parent,  title):
         wx.Frame.__init__(self, parent, title=title, size=(200,100))
         self.control = ImagePanel(self, wx.ID_ANY)
-        self.CreateStatusBar()
+        self.statusbar = self.CreateStatusBar()
         self.dirname = ""
         self.filename = ""
 
@@ -184,6 +185,16 @@ class MyFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnHistogramEq, menuHistEq)
 
+        # Expt 11 menu
+        expt11menu = wx.Menu()
+
+        menuMakeOptimalMono = \
+        expt11menu.Append(wx.ID_ANY, "Make Optimal Mono", "Make binary img using optimal threshold")
+
+        menuBar.Append(expt11menu, "Expt11")
+
+        self.Bind(wx.EVT_MENU, self.OnMakeOptimalMono, menuMakeOptimalMono)
+
     # FILE MENU
     def OnOpen(self, _event):
         "File dialog box"
@@ -217,6 +228,7 @@ class MyFrame(wx.Frame):
         "Resets the current image"
         OriginalImage = self.control.original
         self.control.display(OriginalImage)
+        self.statusbar.SetStatusText('')
 
     def OnAbout(self, _event):
         "A message dialog with an OK button."
@@ -319,6 +331,16 @@ class MyFrame(wx.Frame):
         PilImage = self.control.image
         HistEqImage = expt10.histogramEq(PilImage)
         self.control.display(HistEqImage)
+
+    # EXPT 11 MENU
+    def OnMakeOptimalMono(self, _event):
+        "Grab current image, replace with optimal binary image"
+        PilImage = self.control.image
+        OptimalMonoImg = expt11.makeOptimalMono(PilImage)
+        self.control.display(OptimalMonoImg)
+
+        OptimalThreshold = expt11.optimalThreshold(PilImage)
+        self.statusbar.SetStatusText(f'Optimal Threshold: {OptimalThreshold}')
 
 app = wx.App(False)
 frame = MyFrame(None, 'IP Expts')
