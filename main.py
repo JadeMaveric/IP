@@ -11,6 +11,7 @@ import expt8
 import expt9
 import expt10
 import expt11
+import expt12
 
 import convert
 
@@ -195,6 +196,16 @@ class MyFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.OnMakeOptimalMono, menuMakeOptimalMono)
 
+        # Expt 12 menu
+        expt12menu = wx.Menu()
+
+        menuGrayScaleErosion = \
+        expt12menu.Append(wx.ID_ANY, "Gray Scale Erosion", "Convert image to grayscale & apply GSE")
+
+        menuBar.Append(expt12menu, "Expt 12")
+
+        self.Bind(wx.EVT_MENU, self.OnGrayScaleErosion, menuGrayScaleErosion)
+
     # FILE MENU
     def OnOpen(self, _event):
         "File dialog box"
@@ -341,6 +352,14 @@ class MyFrame(wx.Frame):
 
         OptimalThreshold = expt11.optimalThreshold(PilImage)
         self.statusbar.SetStatusText(f'Optimal Threshold: {OptimalThreshold}')
+
+    # EXPT 12 MENU
+    def OnGrayScaleErosion(self, _event):
+        "Grab current image, replace with gray scale eroded image"
+        PilImage = self.control.image
+        ErodedImg = expt12.grayScaleErosion(PilImage)
+        self.control.display(ErodedImg)
+
 
 app = wx.App(False)
 frame = MyFrame(None, 'IP Expts')
