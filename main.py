@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 "Driver for image processing experiments"
 import os
 import wx
